@@ -22,6 +22,9 @@ const (
 	stopTimeout = time.Second * 30
 )
 
+// TODO: dependency injection pattern for logs
+// TODO: more verbose logs
+
 type api struct {
 	docker *client.Client
 }
