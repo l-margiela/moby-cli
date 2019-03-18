@@ -63,6 +63,7 @@ func (a api) containerCreate(ctx context.Context, config *container.Config, host
 	return a.docker.ContainerCreate(ctx, config, hostConfig, networkingConfig, containerName)
 }
 
+// RunContainerBackground creates a container from given image and starts it
 func (a api) RunContainerBackground(image string) error {
 	log.Printf("Starting image %s", image)
 	ctx := context.Background()
@@ -86,6 +87,7 @@ func (a api) RunContainerBackground(image string) error {
 	return nil
 }
 
+// RunContainerCmd creates a container from given image and and executes the command in it
 func (a api) RunContainerCmd(image string, cmd []string) (string, error) {
 	ctx := context.Background()
 
@@ -134,6 +136,7 @@ func (a api) RunContainerCmd(image string, cmd []string) (string, error) {
 	return string(outRead), nil
 }
 
+// StopContainer stops container
 func (a *api) StopContainer(id string) error {
 	log.Printf("Stopping container %s", id)
 
@@ -141,7 +144,8 @@ func (a *api) StopContainer(id string) error {
 	return a.docker.ContainerStop(context.Background(), id, &tmp)
 }
 
-func (a *api) List() ([]types.Container, error) {
+// ListContainers lists containers
+func (a *api) ListContainers() ([]types.Container, error) {
 	containers, err := a.docker.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "list containers")

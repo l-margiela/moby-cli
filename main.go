@@ -27,7 +27,7 @@ func handleRunContainer(a *api, img, cmd string) error {
 }
 
 func handleListContainers(a *api) error {
-	cs, err := a.List()
+	cs, err := a.ListContainers()
 	if err != nil {
 		return err
 	}
