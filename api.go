@@ -64,6 +64,11 @@ func (a api) containerCreate(ctx context.Context, config *container.Config, host
 	return a.docker.ContainerCreate(ctx, config, hostConfig, networkingConfig, containerName)
 }
 
+func (a api) containerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error {
+	log.Printf("Starting container %s", containerID)
+	return a.docker.ContainerStart(ctx, containerID, options)
+}
+
 // RunContainerBackground creates a container from given image and starts it
 func (a api) RunContainerBackground(image string) error {
 	log.Printf("Starting image %s", image)
@@ -81,7 +86,7 @@ func (a api) RunContainerBackground(image string) error {
 		return errors.Wrap(err, "create container")
 	}
 
-	if err := a.docker.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := a.containerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return errors.Wrap(err, "start container")
 	}
 
@@ -92,12 +97,12 @@ func (a api) RunContainerBackground(image string) error {
 func (a api) RunContainerCmd(image string, cmd []string) (string, error) {
 	ctx := context.Background()
 
-	_, err := a.docker.ImagePull(ctx, image, types.ImagePullOptions{})
+	_, err := a.imagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
 		return "", errors.Wrap(err, "pull image")
 	}
 
-	resp, err := a.docker.ContainerCreate(ctx, &container.Config{
+	resp, err := a.containerCreate(ctx, &container.Config{
 		Image: imageName(image),
 		Cmd:   cmd,
 		Tty:   true,
@@ -106,7 +111,7 @@ func (a api) RunContainerCmd(image string, cmd []string) (string, error) {
 		return "", errors.Wrap(err, "create container")
 	}
 
-	if err := a.docker.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := a.containerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return "", errors.Wrap(err, "start container")
 	}
 
