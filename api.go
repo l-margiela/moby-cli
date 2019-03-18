@@ -35,6 +35,7 @@ func newAPI() (*api, error) {
 	return a, nil
 }
 
+// Init creates client to communicate with Docker
 func (a *api) Init() error {
 	docker, err := client.NewClientWithOpts()
 	if err != nil {
